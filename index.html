@@ -10,22 +10,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- ========================================================================================= -->
-    <!-- 🚨 ATENÇÃO DONO DA LOJA: FAVICON (ÍCONE DO NAVEGADOR) 🚨                                  -->
-    <!-- É aqui abaixo que você deve colocar o link para a imagem que vai aparecer na aba          -->
-    <!-- do navegador (como um novelo de lã ou a sua logo em tamanho pequenininho).                -->
-    <!-- Substitua o link do 'href' pela URL da sua imagem (ideal que seja quadrada, ex: 32x32px). -->
-    <!-- ========================================================================================= -->
     <link rel="icon" href="https://via.placeholder.com/16x16.png?text=🧶" type="image/png">
 
     <style>
         /* ==================== VARIÁVEIS DE CORES E ESTILOS ==================== */
         :root {
-            --bg-cream: #FCFAF8; /* Fundo off-white muito suave */
-            --primary-pink: #F7E1E5; /* Rosa claro artesanal */
-            --primary-pink-dark: #E3A6B3; /* Rosa para botões e hovers */
-            --secondary-lilac: #E8E0F0; /* Lilás suave */
-            --accent-earth: #8C6A53; /* Tom terroso para textos e contrastes */
+            --bg-cream: #FCFAF8;
+            --primary-pink: #F7E1E5;
+            --primary-pink-dark: #E3A6B3;
+            --secondary-lilac: #E8E0F0;
+            --accent-earth: #8C6A53;
             --text-main: #5C4E4E;
             --white: #FFFFFF;
             --whatsapp-green: #25D366;
@@ -43,7 +37,13 @@
 
         /* ==================== TOPBAR ==================== */
         .topbar { background-color: var(--secondary-lilac); color: var(--accent-earth); font-size: 0.85rem; font-weight: 500; text-align: center; padding: 10px 15px; display: flex; flex-direction: column; gap: 5px; }
-        @media (min-width: 768px) { .topbar { flex-direction: row; justify-content: space-between; padding: 10px 5%; } }
+        @media (min-width: 768px) { .topbar { flex-direction: row; justify-content: space-between; align-items: center; padding: 10px 5%; } }
+
+        /* ==================== AUTENTICAÇÃO E PONTOS (NOVO) ==================== */
+        .auth-bar { display: flex; gap: 15px; align-items: center; justify-content: center; }
+        .auth-btn { background: var(--white); color: var(--accent-earth); border: none; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; font-weight: 600; transition: var(--transition); }
+        .auth-btn:hover { background: var(--primary-pink); }
+        .user-points { background: var(--primary-pink-dark); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
 
         /* ==================== HEADER FIXO ==================== */
         header { background-color: var(--white); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
@@ -69,7 +69,7 @@
         .custom-order:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(227, 166, 179, 0.2); }
         .custom-order h3 { font-family: 'Pacifico', cursive; color: var(--accent-earth); font-size: 1.8rem; margin-bottom: 10px; }
         .custom-order p { margin-bottom: 20px; font-size: 1rem; color: var(--text-main); }
-        .btn-custom { display: inline-block; background-color: var(--accent-earth); color: var(--white); padding: 12px 25px; border-radius: 30px; font-weight: 600; transition: var(--transition); box-shadow: 0 4px 10px rgba(140, 106, 83, 0.3); }
+        .btn-custom { display: inline-block; background-color: var(--accent-earth); color: var(--white); padding: 12px 25px; border-radius: 30px; font-weight: 600; transition: var(--transition); box-shadow: 0 4px 10px rgba(140, 106, 83, 0.3); border: none; cursor: pointer; }
         .btn-custom:hover { background-color: #725541; transform: scale(1.02); }
 
         /* ==================== CATÁLOGO (GRID FLUIDO) ==================== */
@@ -128,10 +128,13 @@
 </head>
 <body>
 
-    <!-- Contato e Informações (Topo) -->
+    <!-- Contato e Informações (Topo) - ATUALIZADO COM AUTENTICAÇÃO -->
     <div class="topbar">
-        <span>📧 contato@crochedaju.com.br</span>
-        <span>📱 WhatsApp: (85) 99999-9999</span>
+        <span>📧 contato@crochedaju.com.br | 📱 WhatsApp: (85) 99999-9999</span>
+        <div class="auth-bar" id="auth-container">
+            <!-- Botão de login padrão -->
+            <button class="auth-btn" id="btn-login" onclick="alert('Área de login (Conecte o Supabase para funcionar)')">Entrar / Cadastrar</button>
+        </div>
     </div>
 
     <!-- Header Principal -->
@@ -167,7 +170,8 @@
 
     <!-- Catálogo Principal (Gerado pelo JS) -->
     <main class="container" id="loja-container">
-        <!-- Produtos injetados aqui -->
+        <!-- O JS injetará os produtos aqui -->
+        <p style="text-align: center; margin: 50px 0; color: var(--accent-earth);">Carregando catálogo de produtos... 🧶</p>
     </main>
 
     <!-- Footer -->
@@ -205,37 +209,35 @@
         </div>
     </div>
 
-    <!-- ==================== JAVASCRIPT (MOTO DE FUNCIONAMENTO) ==================== -->
-    <script>
-        /* 
-           BANCO DE DADOS DA LOJA
-           Adicione ou remova produtos mexendo neste Array.
-           Note a propriedade "variacoes" nos produtos que possuem cores/modelos diferentes!
-        */
+    <!-- ==================== JAVASCRIPT (MODIFICADO COMO MÓDULO PARA SUPABASE) ==================== -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        // ==========================================
+        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        // Cole as credenciais quando tiver criado o projeto!
+        // ==========================================
+        const supabaseUrl = 'COLE_AQUI_A_PROJECT_URL';
+        const supabaseKey = 'COLE_AQUI_A_ANON_PUBLIC_KEY';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
         const imgPlaceholder = "https://via.placeholder.com/400x400.png?text=Croche+da+Ju";
 
-        const catalogoProdutos = [
-            // Categoria: Decoração
-            { id: 1, nome: "Buquê de flores", preco: 142.50, categoria: "Decoração", imagem: imgPlaceholder },
-            { id: 2, nome: "Flor Snoopy", preco: 45.00, categoria: "Decoração", imagem: imgPlaceholder },
-            
-            // Categoria: Louça e Casa
-            { id: 3, nome: "Tapete de Crochê Lavável", preco: 70.00, categoria: "Louça e Casa", imagem: imgPlaceholder },
-            { id: 4, nome: "Porta Copos de Gatinho", preco: 10.00, categoria: "Louça e Casa", imagem: imgPlaceholder, variacoes: ["Branco", "Rosa", "Marrom"] },
-            
-            // Categoria: Brinquedos
-            { id: 5, nome: "Chocalho de Leão com cabo de madeira", preco: 60.00, categoria: "Brinquedos", imagem: imgPlaceholder },
-            { id: 6, nome: "Chocalho de Dinossauro", preco: 60.00, categoria: "Brinquedos", imagem: imgPlaceholder },
-            { id: 7, nome: "Pelúcia Pascal de Enrolados", preco: 50.00, categoria: "Brinquedos", imagem: imgPlaceholder },
-            { id: 8, nome: "Camarão Estrala as Costas", preco: 47.00, categoria: "Brinquedos", imagem: imgPlaceholder, variacoes: ["Rosa", "Verde", "Laranja"] },
+        // MANTIVEMOS SEU CATÁLOGO FIXO COMO "BACKUP" 
+        // Caso o banco falhe ou ainda não tenha sido conectado, o site não fica vazio!
+        let catalogoProdutos = [
+            { id: 1, nome: "Buquê de flores", preco: 142.50, categoria: "Decoração", imagem: "imagens/buque.png" },
+            { id: 2, nome: "Flor Snoopy", preco: 45.00, categoria: "Decoração", imagem: "imagens/florSnoopy.jpeg" },
+            { id: 3, nome: "Tapete de Crochê Lavável", preco: 70.00, categoria: "Louça e Casa", imagem: "imagens/tapete.jpeg" },
+            { id: 4, nome: "Porta Copos de Gatinho", preco: 10.00, categoria: "Louça e Casa", imagem: "imagens/portacopos.png", variacoes: ["Branco", "Rosa", "Marrom"] },
+            { id: 5, nome: "Chocalho de Leão com cabo de madeira", preco: 60.00, categoria: "Brinquedos", imagem: "imagens/chacoalhoLeao.jpeg" },
+            { id: 6, nome: "Chocalho de Dinossauro", preco: 60.00, categoria: "Brinquedos", imagem: "imagens/chacoalhoDino.jpeg" },
+            { id: 7, nome: "Pelúcia Pascal de Enrolados", preco: 50.00, categoria: "Brinquedos", imagem: "imagens/amiguPascalGran.jpeg" },
+            { id: 8, nome: "Camarão Estrala as Costas", preco: 47.00, categoria: "Brinquedos", imagem: "imagens/camarao.jpeg", variacoes: ["Rosa", "Verde", "Laranja"] },
             { id: 9, nome: "Cachorro Amigurumi \"Um qui dito\"", preco: 80.00, categoria: "Brinquedos", imagem: imgPlaceholder },
-            
-            // Categoria: Óculos e Bolsas
             { id: 10, nome: "Bolsa para Garrafa de Água com Alça", preco: 60.00, categoria: "Óculos e Bolsas", imagem: imgPlaceholder },
             { id: 11, nome: "Bolsa de Crochê Rosa com Correntes", preco: 120.00, categoria: "Óculos e Bolsas", imagem: imgPlaceholder },
             { id: 12, nome: "Descanso de óculos de crochê", preco: 35.00, categoria: "Óculos e Bolsas", imagem: imgPlaceholder, variacoes: ["Urso Marrom", "Urso Branco"] },
-            
-            // Categoria: Souvenirs e Acessórios
             { id: 13, nome: "Chaveiro Ratisqueiro Coraline", preco: 40.00, categoria: "Souvenirs e Acessórios", imagem: imgPlaceholder },
             { id: 14, nome: "Chaveiros de Studio Ghibli", preco: 35.00, categoria: "Souvenirs e Acessórios", imagem: imgPlaceholder, variacoes: ["Totoro", "Gato Preto"] },
             { id: 15, nome: "Chaveiro de Pokémon / Pikachu", preco: 30.00, categoria: "Souvenirs e Acessórios", imagem: imgPlaceholder },
@@ -244,38 +246,73 @@
             { id: 18, nome: "Prisilinhas de Cabelo Coraline", preco: 25.00, categoria: "Souvenirs e Acessórios", imagem: imgPlaceholder, variacoes: ["Azul Escuro", "Amarelo"] }
         ];
 
-        /* ==================== CONFIGURAÇÕES GERAIS ==================== */
-        const numeroWhatsApp = "5585999999999"; 
+        // ==========================================
+        // CONFIGURAÇÕES GERAIS E INTEGRAÇÃO DE DADOS
+        // ==========================================
+        const numeroWhatsApp = "558586340875"; 
         const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        /* ==================== RENDERIZAÇÃO DINÂMICA ==================== */
         const lojaContainer = document.getElementById('loja-container');
         const navLinks = document.getElementById('nav-links');
+        const authContainer = document.getElementById('auth-container');
 
+        // FUNÇÃO ADICIONADA: Verificar se o usuário está logado
+        async function verificarSessao() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: perfil } = await supabase.from('perfis').select('pontos, nome').eq('id', session.user.id).single();
+                    
+                    authContainer.innerHTML = `
+                        <span style="font-size: 0.8rem">Olá, ${perfil?.nome?.split(' ')[0] || 'Cliente'}</span>
+                        <span class="user-points">⭐ ${perfil?.pontos || 0} Pontos</span>
+                        <button class="auth-btn" id="btn-logout">Sair</button>
+                    `;
+
+                    document.getElementById('btn-logout').addEventListener('click', async () => {
+                        await supabase.auth.signOut();
+                        window.location.reload();
+                    });
+                }
+            } catch (error) {
+                console.warn("Supabase não configurado. Modo apenas visualização ativo.");
+            }
+        }
+
+        // FUNÇÃO ADICIONADA: Tenta puxar do banco, se der erro, usa o backup
+        async function carregarProdutos() {
+            try {
+                const { data, error } = await supabase.from('produtos').select('*').eq('ativo', true);
+                if (!error && data.length > 0) {
+                    catalogoProdutos = data; // Substitui o array backup pelo do banco
+                }
+            } catch (e) {
+                console.warn("Usando catálogo estático. Conecte o Supabase para carregar do banco.");
+            }
+            renderizarProdutos();
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO DINÂMICA (Exatamente como estava)
+        // ==========================================
         function renderizarProdutos() {
             lojaContainer.innerHTML = '';
             navLinks.innerHTML = '';
 
-            // Pega as categorias existentes no array
             const categoriasUnicas = [...new Set(catalogoProdutos.map(produto => produto.categoria))];
 
             categoriasUnicas.forEach(categoria => {
                 const categoriaId = categoria.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
                 
-                // Cria os links do Header
                 const link = document.createElement('a');
                 link.href = `#${categoriaId}`;
                 link.textContent = categoria;
                 navLinks.appendChild(link);
 
-                // Filtra produtos
                 const produtos = catalogoProdutos.filter(p => p.categoria === categoria);
-
-                // Monta o HTML da Seção
                 let htmlProdutos = '';
+                
                 produtos.forEach(produto => {
-                    
-                    // Lógica para injetar o dropdown se o produto tiver variações
                     let dropdownVariaveis = '';
                     if (produto.variacoes && produto.variacoes.length > 0) {
                         dropdownVariaveis = `
@@ -292,7 +329,7 @@
                                 <h4 class="product-name">${produto.nome}</h4>
                                 <span class="product-price">${formatarMoeda(produto.preco)}</span>
                                 ${dropdownVariaveis}
-                                <button class="btn-add" onclick="adicionarAoCarrinho(${produto.id})">
+                                <button class="btn-add" onclick="window.adicionarAoCarrinho(${produto.id})">
                                     Adicionar ao Carrinho
                                 </button>
                             </div>
@@ -309,10 +346,9 @@
             });
         }
 
-        /* ==================== LÓGICA DO CARRINHO ==================== */
-        let carrinho = []; // Estado do carrinho
+        /* ==================== LÓGICA DO CARRINHO (Exatamente como estava) ==================== */
+        let carrinho = []; 
 
-        // Interface do Carrinho
         const cartOverlay = document.getElementById('cart-overlay');
         const cartSidebar = document.getElementById('cart-sidebar');
         const cartItemsContainer = document.getElementById('cart-items');
@@ -328,22 +364,18 @@
         document.getElementById('close-cart-btn').addEventListener('click', toggleCart);
         cartOverlay.addEventListener('click', toggleCart);
 
-        // Função principal de adição (Lida com Variações de forma inteligente)
+        // Exportado para window pois estamos em um <script type="module">
         window.adicionarAoCarrinho = (idProduto) => {
             const produto = catalogoProdutos.find(p => p.id === idProduto);
             if (!produto) return;
 
             let variacaoSelecionada = null;
-            
-            // Verifica se este produto na tela possui o select renderizado
             const selectElement = document.getElementById(`var-${idProduto}`);
             if (selectElement) {
                 variacaoSelecionada = selectElement.value;
             }
 
-            // Cria um ID único pro carrinho (ex: 4-Branco, ou só 1 se não tiver variação)
             const cartItemId = variacaoSelecionada ? `${idProduto}-${variacaoSelecionada}` : `${idProduto}`;
-
             const itemExistente = carrinho.find(item => item.cartId === cartItemId);
 
             if (itemExistente) {
@@ -392,7 +424,7 @@
                             </div>
                             <div class="item-controls">
                                 <strong>Sub: ${formatarMoeda(subtotal)}</strong>
-                                <button class="btn-remove" onclick="removerDoCarrinho('${item.cartId}')">Remover</button>
+                                <button class="btn-remove" onclick="window.removerDoCarrinho('${item.cartId}')">Remover</button>
                             </div>
                         </div>
                     `;
@@ -403,7 +435,7 @@
             cartCount.textContent = qtdItens;
         }
 
-        /* ==================== CHECKOUT WHATSAPP ==================== */
+        /* ==================== CHECKOUT WHATSAPP (Exatamente como estava) ==================== */
         document.getElementById('checkout-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -439,8 +471,12 @@
             window.open(url, '_blank');
         });
 
-        // Inicializa a loja
-        renderizarProdutos();
+        // ==========================================
+        // INICIALIZAÇÃO DA PÁGINA
+        // ==========================================
+        verificarSessao();
+        carregarProdutos();
+
     </script>
 </body>
 </html>
